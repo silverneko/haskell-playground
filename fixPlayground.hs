@@ -70,3 +70,27 @@ node lt a rt = fix $ NodeF lt a rt
 
 tree1 = node (node (node leaf 1 leaf) 1 leaf) 2 (node (node (node leaf 3 (node leaf 5 leaf)) 8 leaf) 13 leaf)
 
+-- Cofree can add annotation to a functor
+-- e.g. annotate a AST, annotate the NatF type with Int
+data Cofree f a = a :< (f (Cofree f a))
+
+deriving instance (Show a, Show (f (Cofree f a))) => Show (Cofree f a)
+deriving instance (Eq a, Eq (f (Cofree f a))) => Eq (Cofree f a)
+
+infixr 5 :<
+
+data NatF :: * -> * where
+  OneF :: NatF a
+  SuccF :: a -> NatF a
+deriving instance Show a => Show (NatF a)
+deriving instance Eq a => Eq (NatF a)
+
+type Nat = Cofree NatF Int
+
+one :: Nat
+one = 1 :< OneF
+
+succ :: Nat -> Nat
+succ f@(a :< _) = a + 1 :< SuccF f
+
+
