@@ -25,7 +25,10 @@ fix = Fix
 unfix :: Fix f -> f (Fix f)
 unfix (Fix f) = f
 
-data ListF a b = NilF | ConsF a b deriving (Show, Eq)
+data ListF :: * -> * -> * where
+  NilF :: ListF a b
+  ConsF :: a -> b -> ListF a b
+  deriving (Show, Eq)
 
 instance Functor (ListF a) where
   fmap _ NilF = NilF
@@ -58,7 +61,10 @@ tail' (Fix (ConsF _ b)) = b
 list1 = 2 `cons` 5 `cons` 8 `cons` nil
 list2 = fmap' show list1
 
-data TreeF a b = LeafF | NodeF b a b deriving (Show, Eq)
+data TreeF :: * -> * -> * where
+  LeafF :: TreeF a b
+  NodeF :: b -> a -> b -> TreeF a b
+  deriving (Show, Eq)
 
 type Tree a = Fix (TreeF a)
 
