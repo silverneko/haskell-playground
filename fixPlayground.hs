@@ -88,8 +88,7 @@ infixr 5 :<
 data NatF :: * -> * where
   OneF :: NatF a
   SuccF :: a -> NatF a
-deriving instance Show a => Show (NatF a)
-deriving instance Eq a => Eq (NatF a)
+  deriving (Show, Eq)
 
 type Nat = Cofree NatF Int
 
