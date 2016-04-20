@@ -10,11 +10,11 @@ import Data.List (sort)
 
 type Set = [Int]
 
-sa <\> sb = sort $ filter (\x -> not $ x `elem` sb) sa
+sa <\> sb = sort $ filter (`notElem` sb) sa
 
 sa <+> sb = sort $ sa ++ (sb <\> sa)
 
-sa <*> sb = sort $ filter (\x -> x `elem` sb) sa
+sa <*> sb = sort $ filter (`elem` sb) sa
 
 data Block = RD
   { name :: String
@@ -28,14 +28,14 @@ data Block = RD
 
 runRD :: [Block] -> [[Block]]
 runRD bs =
-  let entry = (bs !! 0){outset = []}
+  let entry = (head bs){outset = []}
       bs' = entry : map (\i ->
           let b = bs !! i
               gen' = gen b
               kill' = kill b
               preds' = preds b
               outset' = gen' <+> (inset b <\> kill')
-              inset' = foldr (<+>) [] $ map (\j -> outset $ bs' !! j) preds'
+              inset' = foldr (<+>) [] $ map (outset . (bs' !!)) preds'
           in (bs !! i){inset = inset', outset = outset'}
         ) [1 .. length bs - 1]
       scanbs = bs' : runRD bs'
@@ -58,7 +58,6 @@ shortPrint b = name b ++ " inset = " ++ show (inset b) ++ ", outset = " ++ show 
 
 main :: IO ()
 main = do
-  let p = \x -> map (putStrLn . shortPrint) x ++ [putStrLn ""]
-    in sequence_ . map (sequence_ . p) $ runRD testcase1
-  pure ()
+  let p x = sequence_ $ map (putStrLn . shortPrint) x ++ [putStrLn ""]
+  mapM_ p $ runRD testcase1
 
